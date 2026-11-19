@@ -2,13 +2,13 @@ services:
   jellyfin:
     image: jellyfin/jellyfin:${IMAGE_TAG:-latest}
     container_name: ${CONTAINER_NAME:-jellyfin}
-    user: "${PUID:-1000}:${PGID:-1000}"
+    user: "${PUID:-1001}:${PGID:-988}"
     environment:
       - TZ=${TZ:-UTC}
     volumes:
-      - ./config:/config
-      - ./cache:/cache
-      - ./media:/media:ro
+      - ../../var/lib/homelab/jellyfin/config:/config
+      - ../../var/lib/homelab/jellyfin/cache:/cache
+      - ../../var/lib/homelab/jellyfin/media:/media:ro
     restart: unless-stopped
     networks:
       - proxy-net

@@ -19,6 +19,6 @@ Refer to the root [README.md](../README.md) for details on how environment varia
 
 ## 📦 Volumes
 
-- `./config`: Application data and configuration.
-- `./cache`: Metadata and transcode cache.
-- `${MEDIA_PATH}`: Media library (mounted read-only).
+- `../../var/lib/homelab/jellyfin/config`: Application data and configuration.
+- `../../var/lib/homelab/jellyfin/cache`: Metadata and transcode cache.
+- `../../var/lib/homelab/jellyfin/media`: Media library (mounted read-only).
