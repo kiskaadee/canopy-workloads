@@ -16,7 +16,8 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 WORKDIR /app
 
-RUN git clone --depth 1 --branch "${DASHBOARD_REF}" "${DASHBOARD_REPO_URL}" . && \
+RUN test -n "${DASHBOARD_REPO_URL}" || { echo "ERROR: DASHBOARD_REPO_URL build arg is required" >&2; exit 1; } && \
+    git clone --depth 1 --branch "${DASHBOARD_REF}" "${DASHBOARD_REPO_URL}" . && \
     pnpm install --frozen-lockfile && \
     pnpm run build
 

@@ -2,7 +2,7 @@ services:
   gitea:
     image: gitea/gitea:${GITEA_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-gitea}
-    restart: always
+    restart: unless-stopped
     environment:
       - USER_UID=${USER_UID:-1000}
       - USER_GID=${USER_GID:-1000}

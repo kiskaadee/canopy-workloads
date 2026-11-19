@@ -2,7 +2,7 @@ services:
   snappymail:
     image: ghcr.io/the-djmaze/snappymail:${SNAPPYMAIL_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-snappymail}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./data:/var/lib/snappymail/_data_
     networks:
