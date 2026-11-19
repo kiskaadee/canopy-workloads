@@ -18,7 +18,7 @@ services:
     ports:
       - "${SSH_PORT:-2223}:22"
     volumes:
-      - ./data:/data
+      - ../../var/lib/homelab/gitea:/data
     networks:
       - proxy-net
     labels:

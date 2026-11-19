@@ -14,4 +14,5 @@ deployment:
   branch: "main"
   actions:
     - git_pull
+    - compose_build
     - compose_up
