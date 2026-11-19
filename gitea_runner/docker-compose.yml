@@ -1,0 +1,20 @@
+services:
+  gitea_runner:
+    image: gitea/act_runner:${ACT_RUNNER_VERSION:-latest}
+    container_name: ${CONTAINER_NAME:-gitea-runner}
+    restart: unless-stopped
+    environment:
+      - GITEA_INSTANCE_URL=${GITEA_INSTANCE_URL:-https://gitea.${DOMAIN}}
+      - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN:-}
+      - GITEA_RUNNER_NAME=${GITEA_RUNNER_NAME:-homelab-runner}
+      - GITEA_RUNNER_LABELS=${GITEA_RUNNER_LABELS:-ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest,ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-latest}
+      - DOCKER_HOST=${DOCKER_HOST:-tcp://docker-socket-proxy:2375}
+    volumes:
+      - ./data:/data
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    name: ${PROXY_NETWORK:-proxy-net}
+    external: true

@@ -1,0 +1,17 @@
+schemaVersion: "1.0"
+name: "gitea_runner"
+aliases:
+  - "act_runner"
+  - "runner"
+domain: "internal"
+description: "Standalone Gitea Actions CI/CD Runner"
+visible: false
+auth: false
+networks:
+  - proxy-net
+deployment:
+  strategy: "compose"
+  branch: "main"
+  actions:
+    - git_pull
+    - compose_up

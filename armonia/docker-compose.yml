@@ -1,0 +1,99 @@
+services:
+  armonia-api:
+    image: ${ARMONIA_API_IMAGE:-armonia-api:latest}
+    container_name: ${ARMONIA_API_CONTAINER:-armonia-api}
+    user: "${PUID:-1000}:${PGID:-1000}"
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - APP_ENV=${APP_ENV:-production}
+      - AUTH_PROVIDER=${AUTH_PROVIDER:-proxy_headers}
+      - DATABASE_URL=${DATABASE_URL:-file:/data/armonia.db}
+      - DATABASE_AUTH_TOKEN=${DATABASE_AUTH_TOKEN:-}
+      - DASHBOARD_ORIGIN_URL=https://${SERVICE_DOMAIN}
+      - CORS_ORIGINS=${CORS_ORIGINS:-["https://${SERVICE_DOMAIN}"]}
+      - THERAPIST_NAME=${THERAPIST_NAME:-}
+      - BUSINESS_NAME=${BUSINESS_NAME:-Armonía del Ser}
+      - WHATSAPP_PHONE=${WHATSAPP_PHONE:-}
+      - SPEI_CLABE=${SPEI_CLABE:-}
+      - SPEI_BANK=${SPEI_BANK:-}
+      - SPEI_BENEFICIARY=${SPEI_BENEFICIARY:-}
+      - GCAL_CALENDAR_ID=${GCAL_CALENDAR_ID:-primary}
+      - GOOGLE_SERVICE_ACCOUNT_JSON=${GOOGLE_SERVICE_ACCOUNT_JSON:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - proxy-net
+    labels:
+      - "diun.enable=false"
+      - "traefik.enable=true"
+
+      # Middleware: Strip /api prefix before forwarding to FastAPI (which serves at /)
+      - "traefik.http.middlewares.armonia-api-strip.stripprefix.prefixes=/api"
+
+      # 1. Public API & Health Router (Priority 30 — bypasses Authelia forward-auth)
+      - "traefik.http.routers.armonia-api-public.rule=Host(`${SERVICE_DOMAIN}`) && (PathPrefix(`/api/health`) || PathPrefix(`/api/availability`) || (Method(`GET`, `HEAD`, `OPTIONS`) && PathPrefix(`/api/services`)) || (Method(`POST`, `OPTIONS`) && PathPrefix(`/api/bookings`)))"
+      - "traefik.http.routers.armonia-api-public.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.armonia-api-public.tls=true"
+      - "traefik.http.routers.armonia-api-public.tls.certresolver=${CERT_RESOLVER:-myresolver}"
+      - "traefik.http.routers.armonia-api-public.priority=30"
+      - "traefik.http.routers.armonia-api-public.middlewares=armonia-api-strip@docker"
+      - "traefik.http.routers.armonia-api-public.service=armonia-api-svc"
+
+      # 2. Protected Operator API Router (Priority 20 — guarded by Authelia + LLDAP role mapping)
+      - "traefik.http.routers.armonia-api.rule=Host(`${SERVICE_DOMAIN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.armonia-api.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.armonia-api.tls=true"
+      - "traefik.http.routers.armonia-api.tls.certresolver=${CERT_RESOLVER:-myresolver}"
+      - "traefik.http.routers.armonia-api.priority=20"
+      - "traefik.http.routers.armonia-api.middlewares=${AUTH_MIDDLEWARE:-authelia-auth@docker},armonia-api-strip@docker"
+      - "traefik.http.routers.armonia-api.service=armonia-api-svc"
+
+      # Service Target
+      - "traefik.http.services.armonia-api-svc.loadbalancer.server.port=8000"
+
+  armonia-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+      args:
+        DASHBOARD_REPO_URL: ${DASHBOARD_REPO_URL:-}
+        DASHBOARD_REF: ${DASHBOARD_REF:-main}
+        VITE_API_BASE_URL: /api
+    container_name: ${ARMONIA_DASHBOARD_CONTAINER:-armonia-dashboard}
+    restart: unless-stopped
+    depends_on:
+      armonia-api:
+        condition: service_healthy
+    networks:
+      - proxy-net
+    labels:
+      - "diun.enable=false"
+      - "traefik.enable=true"
+
+      # 3. Protected Operator Dashboard UI Router (Priority 10 — guarded by Authelia)
+      - "traefik.http.routers.armonia-dashboard.rule=Host(`${SERVICE_DOMAIN}`) && PathPrefix(`/`)"
+      - "traefik.http.routers.armonia-dashboard.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.armonia-dashboard.tls=true"
+      - "traefik.http.routers.armonia-dashboard.tls.certresolver=${CERT_RESOLVER:-myresolver}"
+      - "traefik.http.routers.armonia-dashboard.priority=10"
+      - "traefik.http.routers.armonia-dashboard.middlewares=${AUTH_MIDDLEWARE:-authelia-auth@docker}"
+      - "traefik.http.routers.armonia-dashboard.service=armonia-dashboard-svc"
+
+      # 4. HTTP to HTTPS Redirect
+      - "traefik.http.routers.armonia-red.rule=Host(`${SERVICE_DOMAIN}`)"
+      - "traefik.http.routers.armonia-red.entrypoints=${HTTP_ENTRYPOINT:-web}"
+      - "traefik.http.routers.armonia-red.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-https-redirect@docker}"
+
+      # Service Target
+      - "traefik.http.services.armonia-dashboard-svc.loadbalancer.server.port=80"
+
+networks:
+  proxy-net:
+    name: ${PROXY_NETWORK:-proxy-net}
+    external: true
