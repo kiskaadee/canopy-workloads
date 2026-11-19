@@ -8,7 +8,7 @@ This repository contains the decoupled, portable application stacks managed by t
 
 Each workload lives in its own top-level directory with a declarative `app.yaml` manifest (`schemaVersion: "1.0"`) and a `docker-compose.yml` baseline. Workloads attach to the shared external Docker network (`proxy-net`) and expose Traefik routing labels parameterized via runtime environment variables.
 
-The root [`deployments.yaml`](deployments.yaml) serves as the authoritative workload admission registry, mapping each workload identity and its legacy webhook aliases to `~/Workloads/<app>`.
+The root [`deployments.yaml`](deployments.yaml) serves as the authoritative workload admission registry, mapping each workload identity and its aliases to `~/Workloads/<app>`.
 
 ---
 
