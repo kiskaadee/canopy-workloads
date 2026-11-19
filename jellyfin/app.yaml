@@ -1,0 +1,21 @@
+schemaVersion: "1.0"
+name: "jellyfin"
+aliases:
+  - "media"
+description: "Media Server & Streaming Hub"
+visible: true
+auth: true
+networks:
+  - proxy-net
+deployment:
+  strategy: "compose"
+  branch: "main"
+  actions:
+    - git_pull
+    - compose_up
+homepage:
+  title: "Jellyfin"
+  group: "Media & Productivity"
+  icon: "jellyfin.png"
+  container: "jellyfin"
+  weight: 10

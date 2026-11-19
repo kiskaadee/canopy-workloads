@@ -1,0 +1,23 @@
+schemaVersion: "1.0"
+name: "gitea"
+aliases:
+  - "git"
+description: "Self-Hosted Git Service & Code Repository"
+visible: true
+auth: false
+networks:
+  - proxy-net
+env:
+  SSH_PORT: "2223"
+deployment:
+  strategy: "compose"
+  branch: "main"
+  actions:
+    - git_pull
+    - compose_up
+homepage:
+  title: "Gitea"
+  group: "Development & AI"
+  icon: "gitea.png"
+  container: "gitea"
+  weight: 10

@@ -1,0 +1,22 @@
+schemaVersion: "1.0"
+name: "snappymail"
+aliases:
+  - "mail"
+  - "webmail"
+description: "Modern Lightweight Webmail Client"
+visible: true
+auth: false
+networks:
+  - proxy-net
+deployment:
+  strategy: "compose"
+  branch: "main"
+  actions:
+    - git_pull
+    - compose_up
+homepage:
+  title: "Webmail"
+  group: "Communication"
+  icon: "email.png"
+  container: "snappymail"
+  weight: 20

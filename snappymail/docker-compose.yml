@@ -1,0 +1,28 @@
+services:
+  snappymail:
+    image: ghcr.io/the-djmaze/snappymail:${SNAPPYMAIL_VERSION:-latest}
+    container_name: ${CONTAINER_NAME:-snappymail}
+    restart: unless-stopped
+    volumes:
+      - ./data:/var/lib/snappymail/_data_
+    networks:
+      - proxy-net
+    labels:
+      - "traefik.enable=true"
+      # HTTPS Webmail Router
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}.rule=Host(`${SERVICE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}.tls.certresolver=${CERT_RESOLVER:-myresolver}"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}.service=${CONTAINER_NAME:-snappymail}-svc"
+      # HTTP -> HTTPS Redirect Router
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}-red.rule=Host(`${SERVICE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}-red.entrypoints=${HTTP_ENTRYPOINT:-web}"
+      - "traefik.http.routers.${CONTAINER_NAME:-snappymail}-red.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-https-redirect@docker}"
+      # Upstream Service Port
+      - "traefik.http.services.${CONTAINER_NAME:-snappymail}-svc.loadbalancer.server.port=8888"
+
+networks:
+  proxy-net:
+    name: ${PROXY_NETWORK:-proxy-net}
+    external: true

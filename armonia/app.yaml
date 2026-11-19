@@ -1,0 +1,27 @@
+schemaVersion: "1.0"
+name: "armonia"
+aliases:
+  - "armonia-del-ser"
+  - "jasmin"
+description: "Armonía del Ser — Holistic Consultation & Operator Dashboard"
+visible: true
+auth: true
+networks:
+  - proxy-net
+env:
+  ENVIRONMENT: "production"
+  AUTH_PROVIDER: "proxy_headers"
+  DATABASE_URL: "file:/data/armonia.db"
+deployment:
+  strategy: "compose"
+  branch: "main"
+  actions:
+    - git_pull
+    - compose_build
+    - compose_up
+homepage:
+  title: "Armonía del Ser"
+  group: "Applications"
+  icon: "calendar.png"
+  container: "armonia-dashboard"
+  weight: 20

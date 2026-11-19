@@ -1,0 +1,31 @@
+# Authoritative Workload Admission Registry
+# Enforces strict path containment within ~/Workloads (WORKLOADS_DIR).
+
+schemaVersion: "1.0"
+repositories:
+  gitea:
+    path: "~/Workloads/gitea"
+    aliases:
+      - "git"
+      - "homelab-gitea"
+  gitea_runner:
+    path: "~/Workloads/gitea_runner"
+    aliases:
+      - "act_runner"
+      - "runner"
+  snappymail:
+    path: "~/Workloads/snappymail"
+    aliases:
+      - "mail"
+      - "webmail"
+  jellyfin:
+    path: "~/Workloads/jellyfin"
+    aliases:
+      - "media"
+      - "homelab-jellyfin"
+  armonia:
+    path: "~/Workloads/armonia"
+    aliases:
+      - "armonia-del-ser"
+      - "jasmin"
+      - "homelab-armonia"
