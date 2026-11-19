@@ -4,7 +4,7 @@ services:
     container_name: ${CONTAINER_NAME:-snappymail}
     restart: unless-stopped
     volumes:
-      - ./data:/var/lib/snappymail/_data_
+      - ../../var/lib/homelab/snappymail:/var/lib/snappymail/_data_
     networks:
       - proxy-net
     labels:
