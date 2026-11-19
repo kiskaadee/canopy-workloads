@@ -1,11 +1,11 @@
 services:
   armonia-api:
-    image: ${ARMONIA_API_IMAGE:-armonia-api:latest}
+    image: ${ARMONIA_API_IMAGE:-homelab-armonia-armonia-api:latest}
     container_name: ${ARMONIA_API_CONTAINER:-armonia-api}
-    user: "${PUID:-1000}:${PGID:-1000}"
+    user: "${PUID:-1001}:${PGID:-988}"
     restart: unless-stopped
     volumes:
-      - ./data:/data
+      - ../../var/lib/homelab/armonia/data:/data
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-production}
       - APP_ENV=${APP_ENV:-production}
