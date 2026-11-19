@@ -4,9 +4,11 @@
 # Stage 1: Clone and build static SPA bundle from upstream Gitea repository
 FROM node:22-alpine AS builder
 
+ARG PNPM_VERSION=9.15.4
+
 RUN apk add --no-cache git && \
     corepack enable && \
-    corepack prepare pnpm@latest --activate
+    corepack prepare pnpm@${PNPM_VERSION} --activate
 
 ARG DASHBOARD_REPO_URL=""
 ARG DASHBOARD_REF=main

@@ -15,24 +15,24 @@ services:
     labels:
       - "traefik.enable=true"
       # HTTPS Router
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.rule=Host(`${SERVICE_DOMAIN}`)"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.tls=true"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.tls.certresolver=${CERT_RESOLVER:-myresolver}"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.middlewares=${SERVICE_NAME:-jellyfin}-ratelimit@docker"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}.service=${SERVICE_NAME:-jellyfin}-svc"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.rule=Host(`${SERVICE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.entrypoints=${HTTPS_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.tls.certresolver=${CERT_RESOLVER:-myresolver}"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.middlewares=${CONTAINER_NAME:-jellyfin}-ratelimit@docker"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}.service=${CONTAINER_NAME:-jellyfin}-svc"
 
       # Rate Limit Middleware
-      - "traefik.http.middlewares.${SERVICE_NAME:-jellyfin}-ratelimit.ratelimit.average=${RATE_LIMIT_AVG:-100}"
-      - "traefik.http.middlewares.${SERVICE_NAME:-jellyfin}-ratelimit.ratelimit.burst=${RATE_LIMIT_BURST:-50}"
+      - "traefik.http.middlewares.${CONTAINER_NAME:-jellyfin}-ratelimit.ratelimit.average=${RATE_LIMIT_AVG:-100}"
+      - "traefik.http.middlewares.${CONTAINER_NAME:-jellyfin}-ratelimit.ratelimit.burst=${RATE_LIMIT_BURST:-50}"
 
       # HTTP to HTTPS Redirect
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}-red.rule=Host(`${SERVICE_DOMAIN}`)"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}-red.entrypoints=${HTTP_ENTRYPOINT:-web}"
-      - "traefik.http.routers.${SERVICE_NAME:-jellyfin}-red.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-https-redirect@docker}"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}-red.rule=Host(`${SERVICE_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}-red.entrypoints=${HTTP_ENTRYPOINT:-web}"
+      - "traefik.http.routers.${CONTAINER_NAME:-jellyfin}-red.middlewares=${HTTPS_REDIRECT_MIDDLEWARE:-https-redirect@docker}"
 
       # Service definition
-      - "traefik.http.services.${SERVICE_NAME:-jellyfin}-svc.loadbalancer.server.port=8096"
+      - "traefik.http.services.${CONTAINER_NAME:-jellyfin}-svc.loadbalancer.server.port=8096"
 
 networks:
   proxy-net:

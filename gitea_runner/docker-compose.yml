@@ -4,7 +4,7 @@ services:
     container_name: ${CONTAINER_NAME:-gitea-runner}
     restart: unless-stopped
     environment:
-      - GITEA_INSTANCE_URL=${GITEA_INSTANCE_URL:-https://gitea.${DOMAIN}}
+      - GITEA_INSTANCE_URL=${GITEA_INSTANCE_URL:-http://gitea:3000}
       - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN:-}
       - GITEA_RUNNER_NAME=${GITEA_RUNNER_NAME:-homelab-runner}
       - GITEA_RUNNER_LABELS=${GITEA_RUNNER_LABELS:-ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest,ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-latest}
