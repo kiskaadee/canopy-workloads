@@ -10,7 +10,7 @@ services:
       - GITEA_RUNNER_NAME=${GITEA_RUNNER_NAME:-homelab-runner}
       - GITEA_RUNNER_LABELS=${GITEA_RUNNER_LABELS:-ubuntu-latest:host,nix:host}
     volumes:
-      - ~/var/lib/homelab/gitea_runner:/data
+      - ../../var/lib/homelab/gitea_runner:/data
       - nix-store:/nix
     networks:
       - proxy-net

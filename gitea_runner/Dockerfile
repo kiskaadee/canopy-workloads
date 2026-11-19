@@ -1,22 +1,23 @@
-FROM gitea/act_runner:latest AS act-runner
+FROM nixos/nix:2.24.12 AS nix-src
+RUN tar -czf /nix-seed.tar.gz -C /nix .
 
-FROM nixos/nix:latest
+FROM gitea/act_runner:latest
 
-# Enable flakes and nix-command for CI workflows
-RUN echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf
+RUN apk add --no-cache nodejs npm bash git coreutils ca-certificates
 
-# Install Node.js (required by standard GitHub/Gitea Actions JS actions)
-RUN nix-env -iA nixpkgs.nodejs \
-    && nix-collect-garbage -d
+# Regular file (never a symlink into /nix/store) so nix-store volume mounts cannot break it
+RUN mkdir -p /etc/nix /nix && \
+    printf '%s\n' \
+      'sandbox = false' \
+      'experimental-features = nix-command flakes' \
+      'trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=' \
+      > /etc/nix/nix.conf
 
-# Ensure /bin/sleep exists (required by act_runner init)
-RUN mkdir -p /bin \
-    && ln -sf "$(command -v sleep)" /bin/sleep
+COPY --from=nix-src /nix /nix
+COPY --from=nix-src /nix-seed.tar.gz /opt/nix-seed.tar.gz
+COPY entrypoint-nix.sh /usr/local/bin/entrypoint-nix.sh
+RUN chmod +x /usr/local/bin/entrypoint-nix.sh
 
-# Copy static act_runner binary and entrypoint from official image
-COPY --from=act-runner /usr/local/bin/act_runner /usr/local/bin/act_runner
-COPY --from=act-runner /usr/local/bin/run.sh /usr/local/bin/run.sh
+ENV PATH="/usr/local/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin"
 
-ENV PATH="/usr/local/bin:/root/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin"
-
-ENTRYPOINT ["/usr/local/bin/run.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint-nix.sh"]

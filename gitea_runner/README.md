@@ -6,8 +6,8 @@ Standalone `act_runner` for Gitea Actions, built with Nix (`nix-command` and `fl
 
 - **Host-Mode Execution (`:host`)**: Core platform security bans direct Docker socket mounts and enforces a read-only `socket-proxy` (`POST=0`), so `act_runner` cannot spawn `docker://` job containers. Jobs run directly inside the runner container via `:host` labels (`ubuntu-latest:host,nix:host`).
 - **Persistent State & Nix Cache**:
-  - Runner registration and workspace state: `~/var/lib/homelab/gitea_runner:/data` (under `HOMELAB_STATE_ROOT`, default `~/var/lib/homelab`).
-  - Nix store cache: named Docker volume `nix-store:/nix` so evaluated derivations persist across rebuilds.
+  - Runner registration and workspace state: `../../var/lib/homelab/gitea_runner:/data` (resolves relative to `~/Workloads/gitea_runner` to `~/var/lib/homelab/gitea_runner` without requiring `HOME` or `${...}` interpolation).
+  - Nix store cache: named Docker volume `nix-store:/nix` so evaluated derivations persist across rebuilds. If `/nix/var/nix/profiles/default/bin/nix` is missing or broken on an existing volume, `entrypoint-nix.sh` seeds `/nix` from `/opt/nix-seed.tar.gz`.
 
 ## Configuration
 
