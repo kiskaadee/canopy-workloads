@@ -7,7 +7,6 @@ repositories:
     path: "~/Workloads/gitea"
     aliases:
       - "git"
-      - "homelab-gitea"
   gitea_runner:
     path: "~/Workloads/gitea_runner"
     aliases:
@@ -22,10 +21,5 @@ repositories:
     path: "~/Workloads/jellyfin"
     aliases:
       - "media"
-      - "homelab-jellyfin"
   armonia:
     path: "~/Workloads/armonia"
-    aliases:
-      - "armonia-del-ser"
-      - "jasmin"
-      - "homelab-armonia"
